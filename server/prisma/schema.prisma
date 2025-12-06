@@ -22,7 +22,6 @@ model User {
   refreshTokens          RefreshToken[]
   tasks                  Task[]
 }
-
 model RefreshToken {
   id        String   @id @default(uuid())
   tokenHash String
