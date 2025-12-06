@@ -7,6 +7,7 @@ dotenv.config();
 
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/users.js';
+import taskRoutes from './routes/tasks.js';
 import cookieParser from 'cookie-parser'; 
 import { errorHandler } from './middleware/errorHandler.js';
 
@@ -22,5 +23,6 @@ app.get('/', (_req: Request, res: Response) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/tasks', taskRoutes);
 
 app.use(errorHandler);
