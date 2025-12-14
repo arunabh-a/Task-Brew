@@ -1,105 +1,130 @@
-'use client';
-import { useState } from "react";
+"use client";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Status, User } from "@/service/app.interface";
+import { Status } from "@/service/app.interface";
 import { useTasks } from "@/hooks/useTasks";
+import { useAuth } from "@/hooks/useAuth";
 import { Header } from "@/components/layout/Header";
 import { TaskToolbar } from "@/components/layout/Toolbar";
 import { TaskListView } from "@/components/tasks/TaskList";
 import { KanbanBoard } from "@/components/tasks/KanbanBoard";
 import { TaskDialog } from "@/components/tasks/TaskDialog";
 
-// Mock user for demo (in real app, this would come from auth context)
-const mockUser: User = {
-  id: "1",
-  email: "user@example.com",
-  name: "John Doe",
-};
-
 export default function Dashboard() {
-  const router = useRouter();
-  const [user, setUser] = useState<User | null>(mockUser); // Start with mock user for demo
-  const {
-    tasks,
-    searchQuery,
-    setSearchQuery,
-    statusFilter,
-    setStatusFilter,
-    addTask,
-    updateTask,
-    deleteTask,
-    moveTask,
-    getTasksByStatus,
-  } = useTasks();
+    const router = useRouter();
+    const { user, loading: authLoading, logout } = useAuth();
+    const {
+        tasks,
+        loading: tasksLoading,
+        searchQuery,
+        setSearchQuery,
+        statusFilter,
+        setStatusFilter,
+        addTask,
+        updateTask,
+        deleteTask,
+        moveTask,
+        getTasksByStatus,
+    } = useTasks();
 
-  const [view, setView] = useState<"list" | "kanban">("kanban");
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [defaultStatus, setDefaultStatus] = useState<Status>("TODO");
+    const [view, setView] = useState<"list" | "kanban">("kanban");
+    const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+    const [defaultStatus, setDefaultStatus] = useState<Status>("TODO");
 
-  const handleLogout = () => {
-    setUser(null);
-    router.push("/login");
-  };
+    useEffect(() => {
+        // Redirect to login if not authenticated
+        if (!authLoading && !user) {
+            router.push("/login");
+        }
+    }, [user, authLoading, router]);
 
-  const handleCreateTask = (status?: Status) => {
-    if (status) {
-      setDefaultStatus(status);
-    } else {
-      setDefaultStatus("TODO");
+    const handleLogout = async () => {
+        await logout();
+    };
+
+    const handleCreateTask = (status?: Status) => {
+        if (status) {
+            setDefaultStatus(status);
+        } else {
+            setDefaultStatus("TODO");
+        }
+        setIsCreateDialogOpen(true);
+    };
+
+    // Show loading state while checking authentication
+    if (authLoading) {
+        return (
+            <div className="min-h-screen bg-background flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                    <p className="text-muted-foreground">Loading...</p>
+                </div>
+            </div>
+        );
     }
-    setIsCreateDialogOpen(true);
-  };
 
-  if (!user) {
-    return null;
-  }
+    // Don't render if not authenticated
+    if (!user) {
+        return null;
+    }
 
-  return (
-    <div className="min-h-screen bg-background">
-      <Header user={user} onLogout={handleLogout} />
+    return (
+        <div className="min-h-screen bg-background">
+            <Header user={user} onLogout={handleLogout} />
 
-      <main className="container px-4 md:px-6 py-8">
-        <div className="mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold mb-2">My Tasks</h1>
-          <p className="text-muted-foreground">
-            Manage and organize your work efficiently
-          </p>
+            <main className="container px-4 md:px-6 py-8">
+                <div className="mb-8">
+                    <h1 className="text-2xl md:text-3xl font-bold mb-2">
+                        My Tasks
+                    </h1>
+                    <p className="text-muted-foreground">
+                        Manage and organize your work efficiently
+                    </p>
+                </div>
+
+                <TaskToolbar
+                    view={view}
+                    onViewChange={setView}
+                    searchQuery={searchQuery}
+                    onSearchChange={setSearchQuery}
+                    statusFilter={statusFilter}
+                    onStatusFilterChange={setStatusFilter}
+                    onCreateTask={() => handleCreateTask()}
+                />
+
+                {tasksLoading ? (
+                    <div className="flex items-center justify-center py-12">
+                        <div className="text-center">
+                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                            <p className="text-muted-foreground">
+                                Loading tasks...
+                            </p>
+                        </div>
+                    </div>
+                ) : view === "list" ? (
+                    <TaskListView
+                        tasks={tasks}
+                        onUpdate={updateTask}
+                        onDelete={deleteTask}
+                    />
+                ) : (
+                    <KanbanBoard
+                        tasks={tasks}
+                        onUpdate={updateTask}
+                        onDelete={deleteTask}
+                        onMove={moveTask}
+                        onAddTask={handleCreateTask}
+                        getTasksByStatus={getTasksByStatus}
+                    />
+                )}
+
+                <TaskDialog
+                    open={isCreateDialogOpen}
+                    onOpenChange={setIsCreateDialogOpen}
+                    onSubmit={addTask}
+                    defaultStatus={defaultStatus}
+                />
+            </main>
         </div>
-
-        <TaskToolbar
-          view={view}
-          onViewChange={setView}
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          statusFilter={statusFilter}
-          onStatusFilterChange={setStatusFilter}
-          onCreateTask={() => handleCreateTask()}
-        />
-
-        {view === "list" ? (
-          <TaskListView
-            tasks={tasks}
-            onUpdate={updateTask}
-            onDelete={deleteTask}
-          />
-        ) : (
-          <KanbanBoard
-            tasks={tasks}
-            onUpdate={updateTask}
-            onDelete={deleteTask}
-            onMove={moveTask}
-            onAddTask={handleCreateTask}
-            getTasksByStatus={getTasksByStatus}
-          />
-        )}
-
-        <TaskDialog
-          open={isCreateDialogOpen}
-          onOpenChange={setIsCreateDialogOpen}
-          onSubmit={addTask}
-          defaultStatus={defaultStatus}
-        />
-      </main>
-    </div>
-  );
+    );
 }

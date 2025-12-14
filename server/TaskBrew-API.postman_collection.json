@@ -192,6 +192,7 @@
       ],
       "description": "User authentication endpoints"
     },
+    
     {
       "name": "Users",
       "item": [
