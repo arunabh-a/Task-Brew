@@ -204,7 +204,7 @@ export const taskApi = {
         if (filters?.search) params.append("search", filters.search);
 
         const queryString = params.toString();
-        const endpoint = queryString ? `/tasks?${queryString}` : "/tasks";
+        const endpoint = queryString ? `/tasks/tasks?${queryString}` : "/tasks/tasks";
 
         return apiCall(endpoint, {
             method: "GET",
@@ -221,7 +221,7 @@ export const taskApi = {
         priority?: Priority;
         status?: Status;
     }): Promise<Task> => {
-        return apiCall("/tasks", {
+        return apiCall("/tasks/tasks", {
             method: "POST",
             body: JSON.stringify(data),
         });
@@ -240,7 +240,7 @@ export const taskApi = {
             status?: Status;
         }
     ): Promise<Task> => {
-        return apiCall(`/tasks/${taskId}`, {
+        return apiCall(`/tasks/tasks/${taskId}`, {
             method: "PUT",
             body: JSON.stringify(data),
         });
@@ -250,7 +250,7 @@ export const taskApi = {
      * Delete a task
      */
     deleteTask: async (taskId: string): Promise<{ message: string }> => {
-        return apiCall(`/tasks/${taskId}`, {
+        return apiCall(`/tasks/tasks/${taskId}`, {
             method: "DELETE",
         });
     },

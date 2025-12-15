@@ -87,8 +87,8 @@ export default function Dashboard() {
                     onViewChange={setView}
                     searchQuery={searchQuery}
                     onSearchChange={setSearchQuery}
-                    statusFilter={statusFilter}
-                    onStatusFilterChange={setStatusFilter}
+                    statusFilter={statusFilter.toLowerCase() as Status | "all"}
+                    onStatusFilterChange={(status) => setStatusFilter(status === "all" ? "ALL" : status)}
                     onCreateTask={() => handleCreateTask()}
                 />
 

@@ -45,7 +45,7 @@ export function useTasks() {
             const newTask = await apiRoutes.task.createTask({
                 title: taskData.title,
                 description: taskData.description,
-                dueDate: taskData.dueDate?.toISOString(),
+                dueDate: taskData.dueDate,
                 priority: taskData.priority,
                 status: taskData.status,
             });
@@ -62,7 +62,7 @@ export function useTasks() {
             const updatedTask = await apiRoutes.task.updateTask(id, {
                 title: updates.title,
                 description: updates.description,
-                dueDate: updates.dueDate?.toISOString(),
+                dueDate: updates.dueDate,
                 priority: updates.priority,
                 status: updates.status,
             });

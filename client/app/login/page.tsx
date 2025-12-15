@@ -11,14 +11,15 @@ export default function Login() {
 
     useEffect(() => {
         if (isAuthenticated) {
-            router.push("/dashboard");
+            router.push("/");
         }
     }, [isAuthenticated, router]);
 
     const handleLogin = async (email: string, password: string) => {
-        const success = await login(email, password);
+        const result = await login(email, password);
+        const success = typeof result === 'boolean' ? result : result.success;
         if (success) {
-            router.push("/dashboard");
+            router.push("/");
         }
         return success;
     };

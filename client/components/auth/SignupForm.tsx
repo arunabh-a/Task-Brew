@@ -1,5 +1,6 @@
+'use client';
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,12 +8,12 @@ import { Label } from "@/components/ui/label";
 
 interface SignupFormProps {
   onSubmit: (name: string, email: string, password: string) => Promise<boolean>;
-  onGoogleLogin: () => Promise<boolean>;
-  isLoading: boolean;
-  error: string | null;
+//   onGoogleLogin: () => Promise<boolean>;
+//   isLoading: boolean;
+//   error: string | null;
 }
 
-export function SignupForm({ onSubmit, onGoogleLogin, isLoading, error }: SignupFormProps) {
+export function SignupForm({ onSubmit }: SignupFormProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,11 +26,11 @@ export function SignupForm({ onSubmit, onGoogleLogin, isLoading, error }: Signup
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {error && (
+      {/* {error && (
         <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm animate-in">
           {error}
         </div>
-      )}
+      )} */}
 
       <div className="space-y-2">
         <Label htmlFor="name">Full name</Label>
@@ -81,8 +82,8 @@ export function SignupForm({ onSubmit, onGoogleLogin, isLoading, error }: Signup
         <p className="text-xs text-muted-foreground">Must be at least 6 characters</p>
       </div>
 
-      <Button type="submit" className="w-full" disabled={isLoading}>
-        {isLoading ? (
+      <Button type="submit" className="w-full" disabled={false}>
+        {false ? (
           <>
             <Loader2 className="w-4 h-4 animate-spin" />
             Creating account...
@@ -105,8 +106,8 @@ export function SignupForm({ onSubmit, onGoogleLogin, isLoading, error }: Signup
         type="button"
         variant="outline"
         className="w-full"
-        onClick={onGoogleLogin}
-        disabled={isLoading}
+        // onClick={onGoogleLogin}
+        // disabled={isLoading}
       >
         <svg className="w-4 h-4" viewBox="0 0 24 24">
           <path
@@ -131,7 +132,7 @@ export function SignupForm({ onSubmit, onGoogleLogin, isLoading, error }: Signup
 
       <p className="text-center text-sm text-muted-foreground">
         Already have an account?{" "}
-        <Link to="/login" className="text-primary hover:underline font-medium">
+        <Link href="/login" className="text-primary hover:underline font-medium">
           Sign in
         </Link>
       </p>
