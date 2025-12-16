@@ -13,7 +13,7 @@ export function useAuth() {
         // Set up global logout function
         setGlobalLogoutFunction(() => {
             setUser(null);
-            router.push("/login");
+            router.push("/home");
         });
 
         // Load user profile if authenticated
@@ -68,7 +68,7 @@ export function useAuth() {
         } finally {
             setUser(null);
             clearAuthData();
-            router.push("/login");
+            router.push("/home");
         }
     };
 

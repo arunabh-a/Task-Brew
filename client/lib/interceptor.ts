@@ -25,8 +25,8 @@ export const handleAutoLogout = (reason: string = 'Session expired') => {
     }
     
     // Redirect to login page
-    if (window.location.pathname !== '/login') {
-        window.location.href = '/login?reason=session_expired';
+    if (window.location.pathname !== '/login' && window.location.pathname !== '/home') {
+        window.location.href = '/home';
     }
 };
 
