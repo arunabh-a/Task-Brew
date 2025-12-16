@@ -45,7 +45,7 @@ export default function Page() {
               <path d="M9 12l2 2 4-4" />
             </svg>
           </div>
-          <span className="text-xl font-bold">TaskFlow</span>
+          <span className="text-xl font-bold">Taskbrew</span>
         </div>
 
         <div className="flex items-center gap-3">

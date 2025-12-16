@@ -33,7 +33,7 @@ export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
                   <path d="M9 12l2 2 4-4" />
                 </svg>
               </div>
-              <span className="text-2xl font-bold">TaskFlow</span>
+              <span className="text-2xl font-bold">Taskbrew</span>
             </div>
             <h2 className="text-4xl xl:text-5xl font-bold leading-tight mb-4">
               Organize your work,<br />
@@ -66,7 +66,7 @@ export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
                 <path d="M9 12l2 2 4-4" />
               </svg>
             </div>
-            <span className="text-2xl font-bold">TaskFlow</span>
+            <span className="text-2xl font-bold">Taskbrew</span>
           </div>
 
           <div className="mb-8">

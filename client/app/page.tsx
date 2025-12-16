@@ -69,7 +69,7 @@ export default function Dashboard() {
     }
 
     return (
-        <div className="min-h-screen bg-background">
+        <div className="min-h-screen bg-backgrond flex flex-col items-center">
             <Header user={user} onLogout={handleLogout} />
 
             <main className="container px-4 md:px-6 py-8">

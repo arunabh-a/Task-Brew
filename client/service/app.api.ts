@@ -1,35 +1,30 @@
 import { Task, Priority, Status, User } from "./app.interface";
+import { authFetch, handleAutoLogout } from "@/lib/interceptor";
 
-const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
+const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
-// Helper function for API calls
+// Helper function for API calls using authFetch interceptor
 async function apiCall<T>(
     endpoint: string,
     options: RequestInit = {}
 ): Promise<T> {
-    const token = localStorage.getItem("accessToken");
+    try {
+        const response = await authFetch(endpoint, options);
 
-    const config: RequestInit = {
-        ...options,
-        headers: {
-            "Content-Type": "application/json",
-            ...(token && { Authorization: `Bearer ${token}` }),
-            ...options.headers,
-        },
-    };
+        if (!response.ok) {
+            const error = await response
+                .json()
+                .catch(() => ({ message: "An error occurred" }));
+            throw new Error(
+                error.message || `HTTP error! status: ${response.status}`
+            );
+        }
 
-    const response = await fetch(`${baseUrl}${endpoint}`, config);
-
-    if (!response.ok) {
-        const error = await response
-            .json()
-            .catch(() => ({ message: "An error occurred" }));
-        throw new Error(
-            error.message || `HTTP error! status: ${response.status}`
-        );
+        return response.json();
+    } catch (error: any) {
+        console.error(`API call failed for ${endpoint}:`, error);
+        throw error;
     }
-
-    return response.json();
 }
 
 // ============================================
@@ -81,9 +76,10 @@ export const authApi = {
             body: JSON.stringify(data),
         });
 
-        // Store tokens in localStorage
-        localStorage.setItem("accessToken", response.accessToken);
-        localStorage.setItem("refreshToken", response.refreshToken);
+        // Store tokens in cookies (more secure than localStorage)
+        document.cookie = `access_token=${response.accessToken}; path=/; secure; samesite=strict; max-age=${15 * 60}`; // 15 minutes
+        document.cookie = `refresh_token=${response.refreshToken}; path=/; secure; samesite=strict; max-age=${7 * 24 * 60 * 60}`; // 7 days
+        document.cookie = `token_type=Bearer; path=/; secure; samesite=strict`;
 
         return response;
     },
@@ -96,34 +92,53 @@ export const authApi = {
     ): Promise<{
         accessToken: string;
     }> => {
-        const response = await apiCall<{ accessToken: string }>(
-            "/auth/refresh",
-            {
-                method: "POST",
-                body: JSON.stringify({ refreshToken }),
-            }
-        );
+        const response = await fetch(`${baseUrl}/auth/refresh`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ refreshToken }),
+        });
 
-        // Update access token
-        localStorage.setItem("accessToken", response.accessToken);
+        if (!response.ok) {
+            throw new Error("Failed to refresh token");
+        }
 
-        return response;
+        const data = await response.json();
+
+        // Update access token in cookie
+        document.cookie = `access_token=${data.accessToken}; path=/; secure; samesite=strict; max-age=${15 * 60}`;
+
+        return data;
     },
 
     /**
      * Logout user
      */
-    logout: async (refreshToken: string): Promise<{ message: string }> => {
-        const response = await apiCall<{ message: string }>("/auth/logout", {
-            method: "POST",
-            body: JSON.stringify({ refreshToken }),
-        });
+    logout: async (): Promise<{ message: string }> => {
+        const refreshToken = document.cookie
+            .split("; ")
+            .find((row) => row.startsWith("refresh_token="))
+            ?.split("=")[1];
 
-        // Clear tokens
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
+        if (refreshToken) {
+            try {
+                const response = await apiCall<{ message: string }>("/auth/logout", {
+                    method: "POST",
+                    body: JSON.stringify({ refreshToken }),
+                });
+                return response;
+            } catch (error) {
+                console.error("Logout API call failed:", error);
+            }
+        }
 
-        return response;
+        // Clear cookies regardless of API response
+        document.cookie = "access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; secure; samesite=strict";
+        document.cookie = "refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; secure; samesite=strict";
+        document.cookie = "token_type=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; secure; samesite=strict";
+
+        return { message: "Logged out successfully" };
     },
 };
 
@@ -176,9 +191,10 @@ export const userApi = {
             method: "DELETE",
         });
 
-        // Clear tokens
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
+        // Clear cookies
+        document.cookie = "access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; secure; samesite=strict";
+        document.cookie = "refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; secure; samesite=strict";
+        document.cookie = "token_type=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; secure; samesite=strict";
 
         return response;
     },
@@ -271,43 +287,43 @@ export const apiRoutes = {
 // ============================================
 
 /**
- * Set up automatic token refresh
- */
-export const setupTokenRefresh = () => {
-    // Refresh token every 14 minutes (access token expires in 15 minutes)
-    setInterval(async () => {
-        const refreshToken = localStorage.getItem("refreshToken");
-        if (refreshToken) {
-            try {
-                await authApi.refreshToken(refreshToken);
-            } catch (error) {
-                console.error("Failed to refresh token:", error);
-                // Redirect to login if refresh fails
-                localStorage.removeItem("accessToken");
-                localStorage.removeItem("refreshToken");
-                window.location.href = "/login";
-            }
-        }
-    }, 14 * 60 * 1000); // 14 minutes
-};
-
-/**
- * Check if user is authenticated
+ * Check if user is authenticated by checking for access token in cookies
  */
 export const isAuthenticated = (): boolean => {
-    return !!localStorage.getItem("accessToken");
+    const accessToken = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("access_token="))
+        ?.split("=")[1];
+    return !!accessToken;
 };
 
 /**
- * Get stored access token
+ * Get stored access token from cookies
  */
 export const getAccessToken = (): string | null => {
-    return localStorage.getItem("accessToken");
+    return (
+        document.cookie
+            .split("; ")
+            .find((row) => row.startsWith("access_token="))
+            ?.split("=")[1] || null
+    );
 };
 
 /**
- * Get stored refresh token
+ * Get stored refresh token from cookies
  */
 export const getRefreshToken = (): string | null => {
-    return localStorage.getItem("refreshToken");
+    return (
+        document.cookie
+            .split("; ")
+            .find((row) => row.startsWith("refresh_token="))
+            ?.split("=")[1] || null
+    );
+};
+
+/**
+ * Manual logout helper (clears cookies and redirects)
+ */
+export const manualLogout = () => {
+    handleAutoLogout('Manual logout');
 };

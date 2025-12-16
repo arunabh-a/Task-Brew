@@ -30,7 +30,7 @@ export default function Signup() {
     return (
         <AuthLayout
             title="Create an account"
-            subtitle="Get started with TaskFlow today"
+            subtitle="Get started with Taskbrew today"
         >
             <SignupForm
                 onSubmit={handleSignup}
