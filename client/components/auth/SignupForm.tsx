@@ -93,7 +93,7 @@ export function SignupForm({ onSubmit }: SignupFormProps) {
         )}
       </Button>
 
-      <div className="relative">
+      {/* <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-border" />
         </div>
@@ -128,7 +128,7 @@ export function SignupForm({ onSubmit }: SignupFormProps) {
           />
         </svg>
         Continue with Google
-      </Button>
+      </Button> */}
 
       <p className="text-center text-sm text-muted-foreground">
         Already have an account?{" "}
