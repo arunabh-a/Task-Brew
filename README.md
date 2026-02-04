@@ -2,6 +2,8 @@
 
 A modern, full-stack task management application with drag-and-drop Kanban boards, built with Next.js, Express, and Prisma.
 
+> **⚠️ Note**: The Backend Service has been shut down and is no longer available. The frontend application is still accessible but will not function without the backend API.
+
 ## ✨ Features
 
 - 🔐 **Authentication & Authorization** (Powered by [AuthBare](https://github.com/arunabh-a/AuthBare))
