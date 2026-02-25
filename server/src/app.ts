@@ -21,6 +21,11 @@ app.get('/', (_req: Request, res: Response) => {
   res.send('Hello World!');
 });
 
+// Health check endpoint for keeping the server alive
+app.get('/health', (_req: Request, res: Response) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/tasks', taskRoutes);

@@ -2,11 +2,9 @@
 
 A modern, full-stack task management application with drag-and-drop Kanban boards, built with Next.js, Express, and Prisma.
 
-> **⚠️ Note**: The Backend Service has been shut down and is no longer available. The frontend application is still accessible but will not function without the backend API.
-
 ## ✨ Features
 
-- 🔐 **Authentication & Authorization** (Powered by [AuthBare](https://github.com/arunabh-a/AuthBare))
+- 🔐 **Authentication & Authorization** (Powered by [AuthER](https://github.com/arunabh-a/AuthER))
   - Secure JWT access tokens + httpOnly refresh cookies
   - User registration & login with complete validation
   - Automatic token rotation for enhanced security
@@ -40,7 +38,7 @@ A modern, full-stack task management application with drag-and-drop Kanban board
 - **Language**: TypeScript
 - **Database**: PostgreSQL
 - **ORM**: Prisma
-- **Authentication**: Custom [AuthBare](https://github.com/arunabh-a/AuthBare) service
+- **Authentication**: Custom [AuthER](https://github.com/arunabh-a/AuthER) service
   - JWT access tokens (15-minute expiry)
   - HttpOnly refresh cookies (30-day expiry with rotation)
   - Argon2 password hashing
@@ -194,7 +192,7 @@ See [server/prisma/schema.prisma](server/prisma/schema.prisma) for the complete 
 
 ## 🔒 Security Features
 
-The application implements robust security measures powered by **[AuthBare](https://github.com/arunabh-a/AuthBare)**, a custom authentication service:
+The application implements robust security measures powered by **[AuthER](https://github.com/arunabh-a/AuthER)**, a custom authentication service:
 
 ### Authentication Security
 - **Token Rotation**: Refresh tokens rotated on each use
@@ -215,7 +213,7 @@ The application implements robust security measures powered by **[AuthBare](http
 3. **Token Refresh** → Automatic rotation when access token expires
 4. **Logout** → Clears all cookies and revokes refresh tokens
 
-> **Note**: The authentication system is based on **[AuthBare](https://github.com/arunabh-a/AuthBare)**, a custom-built authentication service providing industry-standard security features.
+> **Note**: The authentication system is based on **[AuthER](https://github.com/arunabh-a/AuthER)**, a custom-built authentication service providing industry-standard security features.
 
 ## 🛠️ Development
 
