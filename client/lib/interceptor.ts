@@ -30,7 +30,7 @@ export const authFetch = async <T = unknown>(
     url: string,
     options: RequestInit = {},
 ): Promise<T> => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+    const baseUrl = "/api/proxy";
     const fullUrl = url.startsWith("http") ? url : `${baseUrl}${url}`;
 
     const isFormData = options.body instanceof FormData;
@@ -92,7 +92,7 @@ export const authFetch = async <T = unknown>(
  */
 const refreshTokens = async () => {
     try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+        const baseUrl = "/api/proxy";
         const response = await fetch(`${baseUrl}/auth/refresh`, {
             method: "POST",
             credentials: "include",

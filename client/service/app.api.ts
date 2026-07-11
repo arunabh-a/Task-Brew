@@ -1,7 +1,7 @@
 import { Task, Priority, TaskStatus, User, Project, ProjectMember, DashboardSummary, MemberRole } from "./app.interface";
 import { authFetch, handleAutoLogout } from "@/lib/interceptor";
 
-const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+const baseUrl = "/api/proxy";
 
 
 
